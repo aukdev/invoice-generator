@@ -51,50 +51,238 @@ const styles = StyleSheet.create({
     color: colors.text,
     position: "relative",
   },
-  // Decorative corner elements
+  // Decorative corner elements - Outer Layer
   cornerTopLeft: {
     position: "absolute",
     top: 0,
     left: 0,
-    width: 80,
-    height: 80,
+    width: 90,
+    height: 90,
     borderRightWidth: 2,
     borderBottomWidth: 2,
     borderColor: colors.accent,
-    borderBottomRightRadius: 40,
+    borderBottomRightRadius: 45,
+  },
+  cornerTopLeftInner: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    width: 50,
+    height: 50,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: colors.accent,
+    borderBottomRightRadius: 25,
+  },
+  cornerTopLeftDot: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    width: 6,
+    height: 6,
+    backgroundColor: colors.accent,
+    borderRadius: 3,
   },
   cornerTopRight: {
     position: "absolute",
     top: 0,
     right: 0,
-    width: 80,
-    height: 80,
+    width: 90,
+    height: 90,
     borderLeftWidth: 2,
     borderBottomWidth: 2,
     borderColor: colors.accent,
-    borderBottomLeftRadius: 40,
+    borderBottomLeftRadius: 45,
+  },
+  cornerTopRightInner: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 50,
+    height: 50,
+    borderLeftWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: colors.accent,
+    borderBottomLeftRadius: 25,
+  },
+  cornerTopRightDot: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    width: 6,
+    height: 6,
+    backgroundColor: colors.accent,
+    borderRadius: 3,
   },
   cornerBottomLeft: {
     position: "absolute",
     bottom: 0,
     left: 0,
-    width: 80,
-    height: 80,
+    width: 90,
+    height: 90,
     borderRightWidth: 2,
     borderTopWidth: 2,
     borderColor: colors.accent,
-    borderTopRightRadius: 40,
+    borderTopRightRadius: 45,
+  },
+  cornerBottomLeftInner: {
+    position: "absolute",
+    bottom: 8,
+    left: 8,
+    width: 50,
+    height: 50,
+    borderRightWidth: 1,
+    borderTopWidth: 1,
+    borderColor: colors.accent,
+    borderTopRightRadius: 25,
+  },
+  cornerBottomLeftDot: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    width: 6,
+    height: 6,
+    backgroundColor: colors.accent,
+    borderRadius: 3,
   },
   cornerBottomRight: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    width: 80,
-    height: 80,
+    width: 90,
+    height: 90,
     borderLeftWidth: 2,
     borderTopWidth: 2,
     borderColor: colors.accent,
-    borderTopLeftRadius: 40,
+    borderTopLeftRadius: 45,
+  },
+  cornerBottomRightInner: {
+    position: "absolute",
+    bottom: 8,
+    right: 8,
+    width: 50,
+    height: 50,
+    borderLeftWidth: 1,
+    borderTopWidth: 1,
+    borderColor: colors.accent,
+    borderTopLeftRadius: 25,
+  },
+  cornerBottomRightDot: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    width: 6,
+    height: 6,
+    backgroundColor: colors.accent,
+    borderRadius: 3,
+  },
+  // Side line decorations for each corner
+  cornerTopLeftLineH: {
+    position: "absolute",
+    top: 35,
+    left: 0,
+    width: 25,
+    height: 1,
+    backgroundColor: colors.accent,
+  },
+  cornerTopLeftLineV: {
+    position: "absolute",
+    top: 0,
+    left: 35,
+    width: 1,
+    height: 25,
+    backgroundColor: colors.accent,
+  },
+  cornerTopRightLineH: {
+    position: "absolute",
+    top: 35,
+    right: 0,
+    width: 25,
+    height: 1,
+    backgroundColor: colors.accent,
+  },
+  cornerTopRightLineV: {
+    position: "absolute",
+    top: 0,
+    right: 35,
+    width: 1,
+    height: 25,
+    backgroundColor: colors.accent,
+  },
+  cornerBottomLeftLineH: {
+    position: "absolute",
+    bottom: 35,
+    left: 0,
+    width: 25,
+    height: 1,
+    backgroundColor: colors.accent,
+  },
+  cornerBottomLeftLineV: {
+    position: "absolute",
+    bottom: 0,
+    left: 35,
+    width: 1,
+    height: 25,
+    backgroundColor: colors.accent,
+  },
+  cornerBottomRightLineH: {
+    position: "absolute",
+    bottom: 35,
+    right: 0,
+    width: 25,
+    height: 1,
+    backgroundColor: colors.accent,
+  },
+  cornerBottomRightLineV: {
+    position: "absolute",
+    bottom: 0,
+    right: 35,
+    width: 1,
+    height: 25,
+    backgroundColor: colors.accent,
+  },
+  // Small diamond accent for corners
+  cornerDiamond: {
+    width: 8,
+    height: 8,
+    backgroundColor: colors.accent,
+    transform: "rotate(45deg)",
+  },
+  cornerTopLeftDiamond: {
+    position: "absolute",
+    top: 55,
+    left: 55,
+    width: 8,
+    height: 8,
+    backgroundColor: colors.accent,
+    transform: "rotate(45deg)",
+  },
+  cornerTopRightDiamond: {
+    position: "absolute",
+    top: 55,
+    right: 55,
+    width: 8,
+    height: 8,
+    backgroundColor: colors.accent,
+    transform: "rotate(45deg)",
+  },
+  cornerBottomLeftDiamond: {
+    position: "absolute",
+    bottom: 55,
+    left: 55,
+    width: 8,
+    height: 8,
+    backgroundColor: colors.accent,
+    transform: "rotate(45deg)",
+  },
+  cornerBottomRightDiamond: {
+    position: "absolute",
+    bottom: 55,
+    right: 55,
+    width: 8,
+    height: 8,
+    backgroundColor: colors.accent,
+    transform: "rotate(45deg)",
   },
   // Accent line at top
   accentBar: {
@@ -406,11 +594,38 @@ export default function InvoicePDF({ invoice, company }: InvoicePDFProps) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Decorative Corner Elements */}
+        {/* Decorative Corner Elements - Multi-layer Design */}
+        {/* Top Left Corner */}
         <View style={styles.cornerTopLeft} fixed />
+        <View style={styles.cornerTopLeftInner} fixed />
+        <View style={styles.cornerTopLeftDot} fixed />
+        <View style={styles.cornerTopLeftLineH} fixed />
+        <View style={styles.cornerTopLeftLineV} fixed />
+        <View style={styles.cornerTopLeftDiamond} fixed />
+
+        {/* Top Right Corner */}
         <View style={styles.cornerTopRight} fixed />
+        <View style={styles.cornerTopRightInner} fixed />
+        <View style={styles.cornerTopRightDot} fixed />
+        <View style={styles.cornerTopRightLineH} fixed />
+        <View style={styles.cornerTopRightLineV} fixed />
+        <View style={styles.cornerTopRightDiamond} fixed />
+
+        {/* Bottom Left Corner */}
         <View style={styles.cornerBottomLeft} fixed />
+        <View style={styles.cornerBottomLeftInner} fixed />
+        <View style={styles.cornerBottomLeftDot} fixed />
+        <View style={styles.cornerBottomLeftLineH} fixed />
+        <View style={styles.cornerBottomLeftLineV} fixed />
+        <View style={styles.cornerBottomLeftDiamond} fixed />
+
+        {/* Bottom Right Corner */}
         <View style={styles.cornerBottomRight} fixed />
+        <View style={styles.cornerBottomRightInner} fixed />
+        <View style={styles.cornerBottomRightDot} fixed />
+        <View style={styles.cornerBottomRightLineH} fixed />
+        <View style={styles.cornerBottomRightLineV} fixed />
+        <View style={styles.cornerBottomRightDiamond} fixed />
 
         {/* Accent Bar at top */}
         <View style={styles.accentBar} fixed />
