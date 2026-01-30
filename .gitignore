@@ -44,3 +44,7 @@ supabase/.temp
 # Docker volumes
 postgres_data
 storage_data
+
+# Old Docker files (backup)
+*.old.yml
+Dockerfile.old
