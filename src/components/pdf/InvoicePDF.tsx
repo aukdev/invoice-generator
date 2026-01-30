@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     left: 80,
     right: 80,
     height: 4,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
   },
   // Header
   header: {
