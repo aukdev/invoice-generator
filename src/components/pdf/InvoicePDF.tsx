@@ -44,40 +44,108 @@ const styles = StyleSheet.create({
   page: {
     fontFamily: "Helvetica",
     fontSize: 10,
-    paddingTop: 40,
-    paddingBottom: 60,
-    paddingHorizontal: 40,
+    paddingTop: 50,
+    paddingBottom: 80,
+    paddingHorizontal: 50,
     backgroundColor: colors.white,
     color: colors.text,
+    position: "relative",
+  },
+  // Decorative corner elements
+  cornerTopLeft: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 80,
+    height: 80,
+    borderRightWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: colors.accent,
+    borderBottomRightRadius: 40,
+  },
+  cornerTopRight: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: 80,
+    height: 80,
+    borderLeftWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: colors.accent,
+    borderBottomLeftRadius: 40,
+  },
+  cornerBottomLeft: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    width: 80,
+    height: 80,
+    borderRightWidth: 2,
+    borderTopWidth: 2,
+    borderColor: colors.accent,
+    borderTopRightRadius: 40,
+  },
+  cornerBottomRight: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 80,
+    height: 80,
+    borderLeftWidth: 2,
+    borderTopWidth: 2,
+    borderColor: colors.accent,
+    borderTopLeftRadius: 40,
+  },
+  // Accent line at top
+  accentBar: {
+    position: "absolute",
+    top: 0,
+    left: 80,
+    right: 80,
+    height: 4,
+    backgroundColor: colors.primary,
   },
   // Header
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 40,
+    marginBottom: 35,
     paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    marginTop: 10,
   },
+  // Circular Logo Container
   logoContainer: {
-    width: 100,
-    height: 60,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: colors.background,
+    overflow: "hidden",
+    borderWidth: 2,
+    borderColor: colors.accent,
+    alignItems: "center",
+    justifyContent: "center",
   },
   logo: {
-    maxWidth: 100,
-    maxHeight: 60,
-    objectFit: "contain",
+    width: 60,
+    height: 60,
+    objectFit: "cover",
+    borderRadius: 30,
+  },
+  logoPlaceholder: {
+    fontSize: 24,
+    fontFamily: "Helvetica-Bold",
+    color: colors.primary,
   },
   companyInfo: {
     textAlign: "right",
-    maxWidth: 200,
+    maxWidth: 220,
   },
   companyName: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "Helvetica-Bold",
     color: colors.dark,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   companyDetail: {
     fontSize: 9,
@@ -89,13 +157,28 @@ const styles = StyleSheet.create({
   invoiceMeta: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 30,
+    alignItems: "flex-start",
+    marginBottom: 25,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  invoiceTitleContainer: {
+    flexDirection: "column",
   },
   invoiceTitle: {
-    fontSize: 28,
+    fontSize: 32,
     fontFamily: "Helvetica-Bold",
     color: colors.primary,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
+  },
+  invoiceSubtitle: {
+    fontSize: 9,
+    color: colors.accent,
+    fontFamily: "Helvetica-Bold",
+    textTransform: "uppercase",
+    letterSpacing: 3,
+    marginTop: 4,
   },
   invoiceDetails: {
     textAlign: "right",
@@ -256,35 +339,42 @@ const styles = StyleSheet.create({
     color: colors.primary,
     textAlign: "right",
   },
-  // Footer
+  // Footer - Premium styled
   footer: {
     position: "absolute",
-    bottom: 30,
-    left: 40,
-    right: 40,
+    bottom: 50,
+    left: 50,
+    right: 50,
     textAlign: "center",
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
+  },
+  footerDivider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginBottom: 15,
+  },
+  footerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   footerText: {
     fontSize: 10,
-    color: colors.textLight,
-    fontStyle: "italic",
+    color: colors.accent,
+    fontFamily: "Helvetica-Bold",
+    textAlign: "center",
+    flex: 1,
   },
   footerMeta: {
     fontSize: 8,
     color: colors.textLight,
-    marginTop: 8,
+    marginTop: 10,
   },
-  // Decorative accent bar
-  accentBar: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 4,
-    backgroundColor: colors.primary,
+  // Decorative diamond shape for footer
+  footerDiamond: {
+    width: 8,
+    height: 8,
+    backgroundColor: colors.accent,
+    transform: "rotate(45deg)",
   },
 });
 
@@ -303,28 +393,44 @@ export default function InvoicePDF({ invoice, company }: InvoicePDFProps) {
     });
   };
 
+  // Get company initials for logo placeholder
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Decorative accent bar at top */}
+        {/* Decorative Corner Elements */}
+        <View style={styles.cornerTopLeft} fixed />
+        <View style={styles.cornerTopRight} fixed />
+        <View style={styles.cornerBottomLeft} fixed />
+        <View style={styles.cornerBottomRight} fixed />
+
+        {/* Accent Bar at top */}
         <View style={styles.accentBar} fixed />
 
-        {/* Header with Logo and Company Info */}
+        {/* Header with Circular Logo and Company Info */}
         <View style={styles.header}>
-          {/* Logo */}
+          {/* Circular Logo */}
           <View style={styles.logoContainer}>
             {company.logo_url ? (
               <Image src={company.logo_url} style={styles.logo} />
             ) : (
-              <Text style={styles.companyName}>{company.company_name}</Text>
+              <Text style={styles.logoPlaceholder}>
+                {getInitials(company.company_name || "CO")}
+              </Text>
             )}
           </View>
 
           {/* Company Information */}
           <View style={styles.companyInfo}>
-            {company.logo_url && (
-              <Text style={styles.companyName}>{company.company_name}</Text>
-            )}
+            <Text style={styles.companyName}>{company.company_name}</Text>
             {company.company_address && (
               <Text style={styles.companyDetail}>
                 {company.company_address}
@@ -338,7 +444,10 @@ export default function InvoicePDF({ invoice, company }: InvoicePDFProps) {
 
         {/* Invoice Title and Meta */}
         <View style={styles.invoiceMeta}>
-          <Text style={styles.invoiceTitle}>INVOICE</Text>
+          <View style={styles.invoiceTitleContainer}>
+            <Text style={styles.invoiceTitle}>INVOICE</Text>
+            <Text style={styles.invoiceSubtitle}>Tax Invoice / Receipt</Text>
+          </View>
           <View style={styles.invoiceDetails}>
             <Text style={styles.invoiceLabel}>Invoice Number</Text>
             <Text style={styles.invoiceValue}>{invoice.invoice_number}</Text>
@@ -431,11 +540,16 @@ export default function InvoicePDF({ invoice, company }: InvoicePDFProps) {
           </View>
         </View>
 
-        {/* Footer */}
+        {/* Premium Footer */}
         <View style={styles.footer} fixed>
-          <Text style={styles.footerText}>
-            {company.footer_note || "Thank you for your business!"}
-          </Text>
+          <View style={styles.footerDivider} />
+          <View style={styles.footerContent}>
+            <View style={styles.footerDiamond} />
+            <Text style={styles.footerText}>
+              {company.footer_note || "Thank you for your business!"}
+            </Text>
+            <View style={styles.footerDiamond} />
+          </View>
           <Text style={styles.footerMeta}>
             Invoice {invoice.invoice_number} • Generated on{" "}
             {formatDate(new Date().toISOString())}
