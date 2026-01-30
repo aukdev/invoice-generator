@@ -424,6 +424,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 8,
   },
+  // Prevent row from breaking across pages
+  tableRowWrapper: {
+    break: false,
+  },
   tableHeaderText: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
@@ -476,8 +480,10 @@ const styles = StyleSheet.create({
     color: colors.dark,
   },
   // Totals Section - Full width matching table
+  // minPresenceAhead ensures totals stay with at least some content
   totalsContainer: {
     marginBottom: 40,
+    break: false,
   },
   totalRow: {
     flexDirection: "row",
@@ -603,14 +609,6 @@ export default function InvoicePDF({ invoice, company }: InvoicePDFProps) {
         <View style={styles.cornerTopLeftLineV} fixed />
         <View style={styles.cornerTopLeftDiamond} fixed />
 
-        {/* Top Right Corner */}
-        <View style={styles.cornerTopRight} fixed />
-        <View style={styles.cornerTopRightInner} fixed />
-        <View style={styles.cornerTopRightDot} fixed />
-        <View style={styles.cornerTopRightLineH} fixed />
-        <View style={styles.cornerTopRightLineV} fixed />
-        <View style={styles.cornerTopRightDiamond} fixed />
-
         {/* Bottom Left Corner */}
         <View style={styles.cornerBottomLeft} fixed />
         <View style={styles.cornerBottomLeftInner} fixed />
@@ -695,41 +693,43 @@ export default function InvoicePDF({ invoice, company }: InvoicePDFProps) {
 
         {/* Items Table */}
         <View style={styles.table}>
-          {/* Table Header */}
-          <View style={styles.tableHeader}>
+          {/* Table Header - Fixed to appear on every page */}
+          <View style={styles.tableHeader} fixed>
             <Text style={[styles.tableHeaderText, styles.colItem]}>Item</Text>
             <Text style={[styles.tableHeaderText, styles.colPrice]}>Price</Text>
             <Text style={[styles.tableHeaderText, styles.colQty]}>Qty</Text>
             <Text style={[styles.tableHeaderText, styles.colTotal]}>Total</Text>
           </View>
 
-          {/* Table Rows */}
+          {/* Table Rows - Each row wrapped to prevent breaking mid-row */}
           {invoice.items.map((item, index) => (
-            <View
-              key={item.id}
-              style={[
-                styles.tableRow,
-                ...(index % 2 === 1 ? [styles.tableRowAlt] : []),
-              ]}
-            >
-              <View style={styles.colItem}>
-                <Text style={styles.itemName}>{item.item_name}</Text>
+            <View key={item.id} style={styles.tableRowWrapper} wrap={false}>
+              <View
+                style={[
+                  styles.tableRow,
+                  ...(index % 2 === 1 ? [styles.tableRowAlt] : []),
+                ]}
+              >
+                <View style={styles.colItem}>
+                  <Text style={styles.itemName}>{item.item_name}</Text>
+                </View>
+                <Text style={[styles.cellText, styles.colPrice]}>
+                  {formatCurrency(item.unit_price, invoice.currency_symbol)}
+                </Text>
+                <Text style={[styles.cellText, styles.colQty]}>
+                  {item.quantity}
+                </Text>
+                <Text style={[styles.cellTextBold, styles.colTotal]}>
+                  {formatCurrency(item.line_total, invoice.currency_symbol)}
+                </Text>
               </View>
-              <Text style={[styles.cellText, styles.colPrice]}>
-                {formatCurrency(item.unit_price, invoice.currency_symbol)}
-              </Text>
-              <Text style={[styles.cellText, styles.colQty]}>
-                {item.quantity}
-              </Text>
-              <Text style={[styles.cellTextBold, styles.colTotal]}>
-                {formatCurrency(item.line_total, invoice.currency_symbol)}
-              </Text>
             </View>
           ))}
         </View>
 
         {/* Totals - Full width matching table structure */}
-        <View style={styles.totalsContainer}>
+        {/* wrap=false ensures all totals stay together on the same page */}
+        <View style={styles.totalsContainer} wrap={false}>
           <View style={styles.totalRow}>
             <View style={styles.totalSpacer} />
             <Text style={styles.totalLabel}>Subtotal</Text>
