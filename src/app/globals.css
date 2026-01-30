@@ -1,0 +1,446 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================
+   2025 PREMIUM DARK MOBILE-FIRST DESIGN SYSTEM
+   Sophisticated. Minimal. Elegant.
+   ============================================= */
+
+@layer base {
+  :root {
+    /* Premium color tokens */
+    --color-bg: 250 250 250;
+    --color-surface: 255 255 255;
+    --color-text: 23 23 23;
+    --color-text-muted: 115 115 115;
+    --color-border: 229 229 229;
+    --color-accent: 212 175 55;
+
+    /* Typography */
+    --font-display: "Inter", system-ui, -apple-system, sans-serif;
+
+    /* Safe areas for mobile */
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+    --safe-left: env(safe-area-inset-left);
+    --safe-right: env(safe-area-inset-right);
+
+    /* Premium shadows */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+    --shadow-sm:
+      0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+    --shadow-md:
+      0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg:
+      0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    --shadow-xl:
+      0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  }
+
+  html {
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-surface-50 text-primary-900;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+
+  /* Better touch targets */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+
+  /* Remove tap highlight on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Hide scrollbars but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* =============================================
+     PREMIUM INPUT STYLES
+     ============================================= */
+  .input-premium {
+    @apply w-full px-4 py-4 text-base;
+    @apply bg-white border border-surface-200 rounded-2xl;
+    @apply text-primary-900 placeholder:text-surface-400;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-900/10 focus:border-primary-800;
+    @apply transition-all duration-200 ease-out;
+    @apply shadow-sm;
+    font-size: 16px;
+  }
+
+  .input-premium:disabled {
+    @apply bg-surface-100 text-surface-500 cursor-not-allowed;
+  }
+
+  /* =============================================
+     PREMIUM BUTTON STYLES
+     ============================================= */
+  .btn-primary {
+    @apply w-full py-4 px-6 font-semibold rounded-2xl;
+    @apply bg-primary-900 text-white;
+    @apply active:scale-[0.98] hover:bg-primary-800;
+    @apply transition-all duration-200 ease-out;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+    @apply shadow-lg shadow-primary-900/20;
+  }
+
+  .btn-secondary {
+    @apply w-full py-4 px-6 font-medium rounded-2xl;
+    @apply bg-white text-primary-900 border border-surface-200;
+    @apply active:scale-[0.98] active:bg-surface-50 hover:border-surface-300;
+    @apply transition-all duration-200 ease-out;
+    @apply shadow-sm;
+  }
+
+  .btn-ghost {
+    @apply py-3 px-4 text-surface-600 font-medium rounded-xl;
+    @apply active:bg-surface-100 hover:bg-surface-50;
+    @apply transition-all duration-150 ease-out;
+  }
+
+  .btn-danger {
+    @apply py-3 px-4 font-medium rounded-xl;
+    @apply bg-rose-600 text-white;
+    @apply active:scale-[0.98] hover:bg-rose-700;
+    @apply transition-all duration-200 ease-out;
+    @apply shadow-sm;
+  }
+
+  .btn-gold {
+    @apply w-full py-4 px-6 font-semibold rounded-2xl;
+    @apply bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 text-primary-900;
+    @apply active:scale-[0.98];
+    @apply transition-all duration-200 ease-out;
+    @apply shadow-lg shadow-amber-500/20;
+  }
+
+  /* =============================================
+     PREMIUM CARD STYLES
+     ============================================= */
+  .card-premium {
+    @apply bg-white rounded-3xl p-5;
+    @apply border border-surface-100;
+    @apply shadow-md shadow-primary-900/5;
+  }
+
+  .card-dark {
+    @apply bg-primary-900 rounded-3xl p-5;
+    @apply text-white;
+    @apply shadow-xl shadow-primary-900/30;
+  }
+
+  .card-elevated {
+    @apply bg-white rounded-3xl p-5;
+    @apply shadow-xl shadow-primary-900/10;
+    @apply border-0;
+  }
+
+  /* =============================================
+     BOTTOM SHEET
+     ============================================= */
+  .bottom-sheet {
+    @apply fixed inset-x-0 bottom-0 bg-white rounded-t-[2rem];
+    @apply shadow-2xl shadow-primary-900/20 z-50;
+    @apply border-t border-surface-100;
+    padding-bottom: max(env(safe-area-inset-bottom), 1.5rem);
+  }
+
+  .bottom-sheet-handle {
+    @apply w-12 h-1 bg-surface-300 rounded-full mx-auto mt-3 mb-5;
+  }
+
+  /* =============================================
+     OVERLAY
+     ============================================= */
+  .overlay {
+    @apply fixed inset-0 bg-primary-950/60 backdrop-blur-sm z-40;
+    @apply animate-fade-in;
+  }
+
+  /* =============================================
+     TYPOGRAPHY
+     ============================================= */
+  .label {
+    @apply block text-sm font-semibold text-surface-500 mb-2 uppercase tracking-wider;
+  }
+
+  .section-title {
+    @apply text-xs font-bold text-surface-400 uppercase tracking-widest;
+  }
+
+  /* =============================================
+     BADGE
+     ============================================= */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .badge-dark {
+    @apply bg-primary-900 text-white;
+  }
+
+  .badge-light {
+    @apply bg-surface-100 text-primary-900;
+  }
+
+  .badge-gold {
+    @apply bg-amber-100 text-amber-800;
+  }
+
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800;
+  }
+
+  .badge-success {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+
+  /* =============================================
+     DIVIDER
+     ============================================= */
+  .divider {
+    @apply border-t border-surface-100 my-5;
+  }
+
+  .divider-dark {
+    @apply border-t border-surface-800 my-5;
+  }
+
+  /* =============================================
+     ITEM ROW
+     ============================================= */
+  .item-row {
+    @apply flex items-center justify-between py-4 px-1;
+    @apply border-b border-surface-100 last:border-b-0;
+  }
+
+  /* =============================================
+     ICON BUTTON
+     ============================================= */
+  .icon-btn {
+    @apply w-12 h-12 flex items-center justify-center rounded-2xl;
+    @apply active:bg-surface-100 hover:bg-surface-50 transition-colors;
+  }
+
+  .icon-btn-dark {
+    @apply w-12 h-12 flex items-center justify-center rounded-2xl;
+    @apply bg-primary-800 text-white;
+    @apply active:bg-primary-700 hover:bg-primary-700 transition-colors;
+  }
+
+  /* =============================================
+     FLOATING ACTION BUTTON
+     ============================================= */
+  .fab {
+    @apply fixed right-5 bottom-24 w-16 h-16 rounded-2xl;
+    @apply bg-primary-900 text-white;
+    @apply shadow-xl shadow-primary-900/40;
+    @apply flex items-center justify-center;
+    @apply active:scale-95 hover:bg-primary-800 transition-all duration-200;
+    z-index: 30;
+  }
+
+  /* =============================================
+     SELECT / DROPDOWN
+     ============================================= */
+  .select-premium {
+    @apply w-full px-4 py-4 text-base bg-white border border-surface-200 rounded-2xl;
+    @apply text-primary-900;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-900/10 focus:border-primary-800;
+    @apply transition-all duration-200 ease-out appearance-none;
+    @apply cursor-pointer shadow-sm;
+    font-size: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a3a3a3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+  }
+
+  /* =============================================
+     QUANTITY STEPPER
+     ============================================= */
+  .qty-stepper {
+    @apply flex items-center gap-1 bg-surface-100 rounded-2xl p-1;
+  }
+
+  .qty-btn {
+    @apply w-11 h-11 flex items-center justify-center rounded-xl;
+    @apply bg-white shadow-sm text-primary-800 font-bold text-lg;
+    @apply active:scale-95 hover:shadow-md transition-all duration-200;
+    @apply border border-surface-100;
+  }
+
+  .qty-value {
+    @apply w-12 text-center font-bold text-lg tabular-nums text-primary-900;
+  }
+
+  /* =============================================
+     TAB NAVIGATION
+     ============================================= */
+  .tab-nav {
+    @apply flex bg-surface-100 rounded-2xl p-1;
+  }
+
+  .tab-item {
+    @apply flex-1 py-3 text-center font-semibold rounded-xl transition-all;
+    @apply text-surface-500;
+  }
+
+  .tab-item.active {
+    @apply bg-primary-900 text-white shadow-sm;
+  }
+
+  /* =============================================
+     EMPTY STATE
+     ============================================= */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+  }
+
+  .empty-state-icon {
+    @apply w-20 h-20 text-surface-300 mb-5;
+  }
+
+  .empty-state-title {
+    @apply text-xl font-bold text-primary-800 mb-2;
+  }
+
+  .empty-state-text {
+    @apply text-sm text-surface-500 max-w-xs;
+  }
+
+  /* =============================================
+     HEADER STYLES
+     ============================================= */
+  .header-premium {
+    @apply sticky top-0 z-30 bg-white/80 backdrop-blur-xl;
+    @apply border-b border-surface-100;
+    padding-top: var(--safe-top);
+  }
+
+  .header-dark {
+    @apply sticky top-0 z-30 bg-primary-900/95 backdrop-blur-xl;
+    @apply border-b border-primary-800;
+    padding-top: var(--safe-top);
+  }
+}
+
+@layer utilities {
+  /* Safe area utilities */
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 1.5rem);
+  }
+
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 1rem);
+  }
+
+  /* Text balance for better typography */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Premium text gradient */
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-clip-text text-transparent;
+  }
+
+  /* Smooth number transitions */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Premium Glass effect */
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-primary-900/70 backdrop-blur-xl border border-primary-800/50;
+  }
+
+  /* Gradient backgrounds */
+  .bg-gradient-dark {
+    @apply bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900;
+  }
+
+  .bg-gradient-gold {
+    @apply bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500;
+  }
+
+  /* Subtle pattern background */
+  .bg-pattern {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgb(0 0 0 / 0.03) 1px,
+      transparent 0
+    );
+    background-size: 24px 24px;
+  }
+}
+
+/* =============================================
+   ANIMATIONS
+   ============================================= */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom focus visible for accessibility */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary-900;
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

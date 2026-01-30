@@ -1,0 +1,97 @@
+# ==============================================
+# KONG CONFIGURATION - PRODUCTION
+# ==============================================
+# Update the CORS origins to your actual domain
+# Replace API keys with production keys generated from your JWT_SECRET
+
+_format_version: "1.1"
+
+services:
+  - name: rest-v1
+    url: http://rest:3000/
+    routes:
+      - name: rest-v1-route
+        strip_path: true
+        paths:
+          - /rest/v1/
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - https://yourdomain.com # CHANGE THIS
+          methods:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Authorization
+            - Content-Type
+            - apikey
+          exposed_headers:
+            - Content-Range
+          credentials: true
+          max_age: 3600
+      - name: key-auth
+        config:
+          hide_credentials: true
+          key_names:
+            - apikey
+      - name: acl
+        config:
+          allow:
+            - anon
+            - service_role
+
+  - name: storage-v1
+    url: http://storage:5000/
+    routes:
+      - name: storage-v1-route
+        strip_path: true
+        paths:
+          - /storage/v1/
+    plugins:
+      - name: cors
+        config:
+          origins:
+            - https://yourdomain.com # CHANGE THIS
+          methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+          headers:
+            - Accept
+            - Authorization
+            - Content-Type
+            - apikey
+          credentials: true
+          max_age: 3600
+      - name: key-auth
+        config:
+          hide_credentials: true
+          key_names:
+            - apikey
+
+# ==============================================
+# CONSUMERS - REPLACE KEYS IN PRODUCTION
+# ==============================================
+# Generate new keys using your JWT_SECRET:
+# https://supabase.com/docs/guides/self-hosting/docker#generate-api-keys
+
+consumers:
+  - username: anon
+    keyauth_credentials:
+      - key: YOUR_ANON_KEY_HERE # CHANGE THIS
+    acls:
+      - group: anon
+
+  - username: service_role
+    keyauth_credentials:
+      - key: YOUR_SERVICE_ROLE_KEY_HERE # CHANGE THIS
+    acls:
+      - group: service_role

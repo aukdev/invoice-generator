@@ -1,0 +1,129 @@
+version: "3.8"
+
+# JWT Secret for Supabase (demo value - change in production)
+x-jwt-secret: &jwt-secret "super-secret-jwt-token-with-at-least-32-characters-long"
+x-anon-key: &anon-key "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
+x-service-key: &service-key "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU"
+
+services:
+  # Supabase Postgres Database
+  db:
+    image: postgres:15-alpine
+    container_name: invoice-db
+    restart: unless-stopped
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: invoice_generator
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./supabase/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d invoice_generator"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Kong API Gateway
+  kong:
+    image: kong:2.8.1
+    container_name: invoice-kong
+    restart: unless-stopped
+    ports:
+      - "54321:8000"
+      - "54320:8443"
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+    volumes:
+      - ./supabase/kong.yml:/kong/kong.yml:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # PostgREST - REST API for Postgres
+  rest:
+    image: postgrest/postgrest:v12.0.1
+    container_name: invoice-rest
+    restart: unless-stopped
+    ports:
+      - "54324:3000"
+    environment:
+      PGRST_DB_URI: postgres://postgres:postgres@db:5432/invoice_generator
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: postgres
+      PGRST_JWT_SECRET: *jwt-secret
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Storage API
+  storage:
+    image: supabase/storage-api:v0.46.4
+    container_name: invoice-storage
+    restart: unless-stopped
+    ports:
+      - "54325:5000"
+    environment:
+      ANON_KEY: *anon-key
+      SERVICE_KEY: *service-key
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: *jwt-secret
+      DATABASE_URL: postgres://postgres:postgres@db:5432/invoice_generator
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
+      IS_MULTITENANT: "false"
+    volumes:
+      - ./storage_data:/var/lib/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+
+  # Meta API for Studio
+  meta:
+    image: supabase/postgres-meta:v0.80.0
+    container_name: invoice-meta
+    restart: unless-stopped
+    ports:
+      - "54326:8080"
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: invoice_generator
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: postgres
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Supabase Studio (optional - for database management)
+  studio:
+    image: supabase/studio:20240422-5cf8f30
+    container_name: invoice-studio
+    restart: unless-stopped
+    ports:
+      - "54323:3000"
+    environment:
+      STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: postgres
+      DEFAULT_ORGANIZATION_NAME: Invoice Generator
+      DEFAULT_PROJECT_NAME: Invoice Generator
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_REST_URL: http://kong:8000/rest/v1/
+      SUPABASE_ANON_KEY: *anon-key
+      SUPABASE_SERVICE_KEY: *service-key
+    depends_on:
+      - meta
+      - kong
