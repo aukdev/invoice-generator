@@ -55,6 +55,8 @@ services:
     image: kong:2.8.1
     container_name: invoice-kong
     restart: unless-stopped
+    ports:
+      - "${KONG_PORT:-8000}:8000"
     environment:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /kong/kong.yml
