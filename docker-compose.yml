@@ -18,7 +18,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-invoice_generator}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
       - ./supabase/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d invoice_generator"]
@@ -97,7 +97,7 @@ services:
       GLOBAL_S3_BUCKET: stub
       IS_MULTITENANT: "false"
     volumes:
-      - storage_data:/var/lib/storage
+      - ./storage_data:/var/lib/storage
     depends_on:
       db:
         condition: service_healthy
@@ -119,7 +119,7 @@ services:
     container_name: invoice-app
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-3000}:3000"
+      - "${APP_PORT:-3027}:3000"
     environment:
       NODE_ENV: production
       # Internal Supabase URL (container-to-container)
@@ -155,11 +155,11 @@ services:
 # ============================================
 # Volumes - Persistent Data
 # ============================================
-volumes:
-  postgres_data:
-    driver: local
-  storage_data:
-    driver: local
+# volumes:
+#   postgres_data:
+#     driver: local
+#   storage_data:
+#     driver: local
 
 # ============================================
 # Networks
