@@ -306,6 +306,12 @@ GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role
 -- Create storage schema if not exists (required for self-hosted Supabase)
 CREATE SCHEMA IF NOT EXISTS storage;
 
+-- Grant permissions on storage schema first
+GRANT USAGE ON SCHEMA storage TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA storage TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA storage TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA storage TO postgres, anon, authenticated, service_role;
+
 -- Create buckets table with all required columns for Supabase Storage API
 CREATE TABLE IF NOT EXISTS storage.buckets (
     id TEXT PRIMARY KEY,
@@ -330,7 +336,8 @@ CREATE TABLE IF NOT EXISTS storage.objects (
     last_accessed_at TIMESTAMPTZ DEFAULT NOW(),
     metadata JSONB,
     path_tokens TEXT[] GENERATED ALWAYS AS (string_to_array(name, '/')) STORED,
-    version TEXT
+    version TEXT,
+    UNIQUE(bucket_id, name)
 );
 
 -- Create migrations table (required by Supabase Storage to track schema version)
@@ -341,13 +348,121 @@ CREATE TABLE IF NOT EXISTS storage.migrations (
     executed_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Required storage functions for Supabase Storage API
+CREATE OR REPLACE FUNCTION storage.get_size_by_bucket()
+RETURNS TABLE (
+    size BIGINT,
+    bucket_id TEXT
+)
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+    SELECT 
+        SUM(COALESCE(metadata->>'size', '0')::BIGINT) as size,
+        bucket_id
+    FROM storage.objects
+    GROUP BY bucket_id;
+$$;
+
+CREATE OR REPLACE FUNCTION storage.search(
+    prefix TEXT,
+    bucketname TEXT,
+    limits INT DEFAULT 100,
+    levels INT DEFAULT 1,
+    offsets INT DEFAULT 0,
+    search TEXT DEFAULT ''::TEXT,
+    sortcolumn TEXT DEFAULT 'name'::TEXT,
+    sortorder TEXT DEFAULT 'asc'::TEXT
+)
+RETURNS TABLE (
+    name TEXT,
+    id UUID,
+    updated_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ,
+    last_accessed_at TIMESTAMPTZ,
+    metadata JSONB
+)
+LANGUAGE plpgsql
+STABLE
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        o.name,
+        o.id,
+        o.updated_at,
+        o.created_at,
+        o.last_accessed_at,
+        o.metadata
+    FROM storage.objects o
+    WHERE o.bucket_id = bucketname
+        AND (prefix = '' OR o.name LIKE prefix || '%')
+        AND (search = '' OR o.name ILIKE '%' || search || '%')
+    ORDER BY
+        CASE WHEN sortcolumn = 'name' AND sortorder = 'asc' THEN o.name END ASC,
+        CASE WHEN sortcolumn = 'name' AND sortorder = 'desc' THEN o.name END DESC,
+        CASE WHEN sortcolumn = 'updated_at' AND sortorder = 'asc' THEN o.updated_at END ASC,
+        CASE WHEN sortcolumn = 'updated_at' AND sortorder = 'desc' THEN o.updated_at END DESC,
+        CASE WHEN sortcolumn = 'created_at' AND sortorder = 'asc' THEN o.created_at END ASC,
+        CASE WHEN sortcolumn = 'created_at' AND sortorder = 'desc' THEN o.created_at END DESC,
+        CASE WHEN sortcolumn = 'last_accessed_at' AND sortorder = 'asc' THEN o.last_accessed_at END ASC,
+        CASE WHEN sortcolumn = 'last_accessed_at' AND sortorder = 'desc' THEN o.last_accessed_at END DESC
+    LIMIT limits
+    OFFSET offsets;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION storage.extension(name TEXT)
+RETURNS TEXT
+LANGUAGE plpgsql
+IMMUTABLE
+AS $$
+DECLARE
+    parts TEXT[];
+BEGIN
+    parts := string_to_array(name, '.');
+    IF array_length(parts, 1) > 1 THEN
+        RETURN lower(parts[array_length(parts, 1)]);
+    END IF;
+    RETURN '';
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION storage.filename(name TEXT)
+RETURNS TEXT
+LANGUAGE plpgsql
+IMMUTABLE
+AS $$
+DECLARE
+    parts TEXT[];
+BEGIN
+    parts := string_to_array(name, '/');
+    RETURN parts[array_length(parts, 1)];
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION storage.foldername(name TEXT)
+RETURNS TEXT[]
+LANGUAGE plpgsql
+IMMUTABLE
+AS $$
+DECLARE
+    parts TEXT[];
+BEGIN
+    parts := string_to_array(name, '/');
+    RETURN parts[1:array_length(parts, 1) - 1];
+END;
+$$;
+
 -- Insert migration records to prevent auto-migration attempts
 INSERT INTO storage.migrations (id, name, hash) VALUES 
     (0, 'create-migrations-table', 'init'),
-    (1, 'create-objects-bucket-table', 'init'),
+    (1, 'initialmigration', 'init'),
     (2, 'pathtoken-column', 'init'),
     (3, 'add-version-column', 'init'),
-    (4, 'add-owner-column', 'init')
+    (4, 'add-owner-column', 'init'),
+    (5, 'change-column-name-in-get-size', 'init'),
+    (6, 'add-metadata-column', 'init')
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert logos bucket with proper configuration
@@ -358,8 +473,20 @@ ON CONFLICT (id) DO NOTHING;
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_objects_bucket_id ON storage.objects(bucket_id);
 CREATE INDEX IF NOT EXISTS idx_objects_name ON storage.objects(name);
+CREATE INDEX IF NOT EXISTS idx_buckets_name ON storage.buckets(name);
 
--- Grant permissions on storage schema
-GRANT USAGE ON SCHEMA storage TO anon, authenticated, service_role;
-GRANT ALL ON ALL TABLES IN SCHEMA storage TO anon, authenticated, service_role;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA storage TO anon, authenticated, service_role;
+-- Enable RLS on storage tables
+ALTER TABLE storage.buckets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- Create storage policies (allow all for development)
+DROP POLICY IF EXISTS "Allow all access to buckets" ON storage.buckets;
+CREATE POLICY "Allow all access to buckets" ON storage.buckets FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Allow all access to objects" ON storage.objects;
+CREATE POLICY "Allow all access to objects" ON storage.objects FOR ALL USING (true);
+
+-- Re-grant permissions after creating functions
+GRANT ALL ON ALL TABLES IN SCHEMA storage TO postgres, anon, authenticated, service_role;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA storage TO postgres, anon, authenticated, service_role;
+

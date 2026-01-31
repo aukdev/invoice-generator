@@ -134,6 +134,18 @@ sudo systemctl restart nginx
 
 ## 🐛 Troubleshooting
 
+### Storage container restarting?
+
+```bash
+# First time setup - recreate database with storage schema
+docker compose down -v
+docker compose up -d
+
+# Check if storage is healthy
+docker compose ps
+docker logs invoice-storage
+```
+
 ### Database not starting?
 
 ```bash
