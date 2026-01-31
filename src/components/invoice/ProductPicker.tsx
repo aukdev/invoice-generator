@@ -5,6 +5,7 @@ import { Search, Plus, Check, X } from "lucide-react";
 import type { Product, InvoiceItem } from "@/types";
 import { getProducts } from "@/lib/api";
 import { formatCurrency } from "@/lib/format";
+import { generateUUID } from "@/lib/uuid";
 import BottomSheet from "@/components/ui/BottomSheet";
 import QuantityStepper from "@/components/ui/QuantityStepper";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -65,7 +66,7 @@ export default function ProductPicker({
     if (!selectedProduct) return;
 
     const item: InvoiceItem = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       product_id: selectedProduct.id,
       item_name: selectedProduct.name,
       unit_price: selectedProduct.unit_price,

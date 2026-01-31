@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CheckCircle, XCircle, Info, X } from "lucide-react";
 import type { Toast as ToastType } from "@/types";
+import { generateUUID } from "@/lib/uuid";
 
 interface ToastProps {
   toast: ToastType;
@@ -77,7 +78,7 @@ export function useToast() {
   const [toasts, setToasts] = useState<ToastType[]>([]);
 
   const addToast = (message: string, type: ToastType["type"] = "info") => {
-    const id = crypto.randomUUID();
+    const id = generateUUID();
     setToasts((prev) => [...prev, { id, message, type }]);
   };
 
